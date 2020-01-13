@@ -39,10 +39,12 @@ class S{
             loop             : 'loop',       // loop, pong or none         TODO: remove
             interval         : 0,            // interval in milliseconds between each frame, applies only if playMode is 'auto'
             autoLoad         : 'all',        // all, first, none: triggers the loading of the queue immediatly, can be disabled to be triggered in a different moment
-            fitFirstImage    : false,        // resizes the canvas to the size of the first loaded image in the sequence
+            fitFirstImage     : false,        // resizes the canvas to the size of the first loaded image in the sequence
             showLoadedImages : false,        // don't display images while loading
             dragAmount       : 10,
             hiDPI            : true,
+            play             : false,
+            reverse          : false,
         };
 
         this.config = Object.assign({}, defaults, opts);
@@ -113,6 +115,20 @@ class S{
                 requestAnimationFrame(loop);
             };
             requestAnimationFrame(loop);
+        } else if (this.config.playMode === 'manual') {
+            let pt = 0;
+            const loop = (t)=> {
+                if(this.config.play){
+                    const dt = t - pt;
+                    if (dt >= this.config.interval) {
+                        this.nextImage();
+                        pt = Math.max(t, t - (dt - this.config.interval));
+                    }
+                    requestAnimationFrame(loop);         
+                }
+                
+            };
+            requestAnimationFrame(loop);
         }
     }
 
@@ -129,7 +145,15 @@ class S{
             }
             this.drawImage(this.current);
         } else {
-            this.drawImage(++this.current % this.images.length); //loop
+            if(this.config.reverse){
+                this.current -= 1;
+                if(this.current <= 0) {
+                    this.current = this.images.length-1;
+                }
+                this.drawImage(this.current % this.images.length); //loop
+            } else {
+                this.drawImage(++this.current % this.images.length); //loop
+            }
         }
     }
 

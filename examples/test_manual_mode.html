@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Sequencer test</title>
+        <button id="btn-toggle">play / pause</button>
+        <button id="btn-fwd">forward</button>
+        <button id="btn-bwd">backwards</button>
+        <input id="slider-interval" type="range" min="10" max="60" value="10" style="direction: rtl">
+
+		<style type="text/css">
+			body   { margin:0; padding:0; }
+			canvas {
+				background-color: rgb(0,0,0);
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas></canvas>
+	</body>
+	<script type="module">
+
+		import Sequencer from '../sequencer/sequencer.js';
+
+		const s = Sequencer.make({
+			canvas           : document.querySelector("canvas"),
+			from             : 'pics/pig/DSC04701.JPG',
+			to               : 'pics/pig/DSC04775.JPG',
+            playMode         : "manual",
+            interval         : 10,
+			showLoadedImages : false,
+			hiDPI           : true,
+			imageLoad        : function(e){
+				//console.log("[id: " + e.id + "] " + e.count + "/" + e.total);
+			},
+			queueComplete    : function(e){
+				//console.log(e);
+			}
+		});
+        
+		s.size(window.innerWidth, window.innerHeight);
+
+		window.addEventListener('resize', function(){
+            s.size(window.innerWidth, window.innerHeight);
+        });
+
+
+        function handleMouseMove() {
+            console.log(s)
+
+        }
+
+        function togglePlay() {
+            s.config.play = !s.config.play;
+            s.run();
+        }
+
+        
+        function playFwd() {
+            s.config.reverse = false; 
+            console.log("s.config.reverse: ", s.config.reverse)
+
+        }
+
+        function playBwd() {
+            s.config.reverse = true; 
+            console.log("s.config.reverse: ", s.config.reverse)
+        }
+
+        function setInverval(e) {
+            s.config.interval = e.target.value; 
+            console.log("s.config.interval: ", s.config.interval)
+
+        }
+
+        const btnToggle = document.getElementById("btn-toggle");
+        btnToggle.addEventListener("click", togglePlay);
+
+        const btnFwd = document.getElementById("btn-fwd");
+        btnFwd.addEventListener("click", playFwd);
+
+        const btnBwd = document.getElementById("btn-bwd");
+        btnBwd.addEventListener("click", playBwd);
+
+        const sliderInterval = document.getElementById("slider-interval")
+        sliderInterval.oninput = setInverval;
+	</script>
+</html>
